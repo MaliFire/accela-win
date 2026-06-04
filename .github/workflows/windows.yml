@@ -52,9 +52,8 @@ jobs:
           pip install pyinstaller
           pip install PyQt6 pyqt6-sip pyqt6-qt6
           pip install requests urllib3 psutil numpy pillow
-          pip install just_playback urwid vdf cryptography gevent
-          pip install "steam[client]" pyyaml beautifulsoup4 tinytag
-          pip install cachetools protobuf validate wcwidth wsproto h11
+          pip install just_playback urwid vdf cryptography gevent zstandard
+          pip install "steam[client]"
 
       - name: Build with PyInstaller
         run: |
