@@ -23,8 +23,6 @@ jobs:
         run: |
           $tar = (Get-ChildItem ACCELA.tar.gz).FullName
           7z x "$tar" -y
-          Get-ChildItem *.tar | Select-Object Name
-
       - name: Extract tar → outer bin/
         run: |
           $tar = (Get-ChildItem *.tar).FullName
@@ -33,7 +31,7 @@ jobs:
       - name: Extract AppImage → source
         run: |
           $appimg = (Get-ChildItem -Recurse -Filter "*.AppImage").FullName
-          7z x "$appimg" -oAppImage -y
+          7z x "$appimg" -oAppImage -y || $true
 
       - name: Locate source directory
         id: find-src
