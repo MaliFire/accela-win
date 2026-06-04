@@ -31,7 +31,8 @@ jobs:
       - name: Extract AppImage → source
         run: |
           $appimg = (Get-ChildItem -Recurse -Filter "*.AppImage").FullName
-          7z x "$appimg" -oAppImage -y || $true
+          cmd /c "7z x `"$appimg`" -oAppImage -y"
+          exit 0
 
       - name: Locate source directory
         id: find-src
