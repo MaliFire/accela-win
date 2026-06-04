@@ -84,8 +84,14 @@ jobs:
             main.py
           Copy-Item -Path "dist\ACCELA.exe" -Destination "${{ github.workspace }}\ACCELA.exe"
 
-      - name: Upload artifact
-        uses: actions/upload-artifact@v7.0.1
-        with:
-          name: ACCELA-Windows
-          path: ACCELA.exe
+      - name: Upload to GitHub Release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          $version = "20260524150213"
+          gh release create "$version" ACCELA.exe `
+            --title "ACCELA $version (Windows)" `
+            --notes "Windows build of ACCELA $version" 2>$null
+          if ($LASTEXITCODE -ne 0) {
+            gh release upload "$version" ACCELA.exe --clobber
+          }
