@@ -1,0 +1,71 @@
+name: Build Windows
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      - name: Download release asset
+        run: |
+          curl -L -o ACCELA.tar.gz `
+            "https://github.com/ciscosweater/enter-the-wired/releases/download/20260524150213/ACCELA-20260524150213-linux.tar.gz"
+
+      - name: Verify SHA256
+        run: |
+          $expected = "1ba947a3c4d060c9064951958471e2166dc9970acef22962296bc539423e51c6"
+          $actual = (Get-FileHash ACCELA.tar.gz -Algorithm SHA256).Hash.ToLower()
+          if ($actual -ne $expected) { throw "SHA256 mismatch!" }
+
+      - name: Extract tar.gz → tar
+        run: 7z x ACCELA.tar.gz -y
+
+      - name: Extract tar → outer bin/
+        run: 7z x ACCELA-*-linux.tar -y
+
+      - name: Extract AppImage → source
+        run: 7z x bin\ACCELA.AppImage -oAppImage -y
+
+      - name: Locate source directory
+        id: find-src
+        run: |
+          $src = Get-ChildItem -Recurse -Filter "main.py" `
+            | Select-Object -First 1 -ExpandProperty DirectoryName
+          echo "src-dir=$src" >> $env:GITHUB_OUTPUT
+
+      - name: Set up Python 3.13
+        uses: actions/setup-python@v6.2.0
+        with:
+          python-version: "3.13"
+
+      - name: Install dependencies
+        run: |
+          pip install --upgrade pip
+          pip install pyinstaller
+          pip install PyQt6 pyqt6-sip pyqt6-qt6
+          pip install requests urllib3 psutil numpy pillow
+          pip install just_playback urwid vdf cryptography gevent
+          pip install "steam[client]" pyyaml beautifulsoup4 tinytag
+          pip install cachetools protobuf validate wcwidth wsproto h11
+
+      - name: Build with PyInstaller
+        run: |
+          cd "${{ steps.find-src.outputs.src-dir }}"
+          pyinstaller --onefile --windowed --name ACCELA `
+            --icon res/logo/icon.ico `
+            --add-data "res;res" `
+            --add-data "deps;deps" `
+            --hidden-import PyQt6.QtSvg `
+            --hidden-import PyQt6.QtNetwork `
+            --hidden-import gevent `
+            --collect-all steam `
+            main.py
+          Copy-Item -Path "dist\ACCELA.exe" -Destination "${{ github.workspace }}\ACCELA.exe"
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v7.0.1
+        with:
+          name: ACCELA-Windows
+          path: ACCELA.exe
