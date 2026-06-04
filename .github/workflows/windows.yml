@@ -20,13 +20,19 @@ jobs:
           if ($actual -ne $expected) { throw "SHA256 mismatch!" }
 
       - name: Extract tar.gz → tar
-        run: 7z x ACCELA.tar.gz -y
+        run: |
+          $tar = (Get-ChildItem ACCELA.tar.gz).FullName
+          7z x "$tar" -y
 
       - name: Extract tar → outer bin/
-        run: 7z x ACCELA-*-linux.tar -y
+        run: |
+          $tar = (Get-ChildItem *-linux.tar).FullName
+          7z x "$tar" -y
 
       - name: Extract AppImage → source
-        run: 7z x bin\ACCELA.AppImage -oAppImage -y
+        run: |
+          $appimg = (Get-ChildItem -Recurse -Filter "*.AppImage").FullName
+          7z x "$appimg" -oAppImage -y
 
       - name: Locate source directory
         id: find-src
