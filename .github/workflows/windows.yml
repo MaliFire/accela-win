@@ -90,8 +90,9 @@ jobs:
         run: |
           $version = "20260524150213"
           gh release create "$version" ACCELA.exe `
+            --repo ciscosweater/enter-the-wired `
             --title "ACCELA $version (Windows)" `
             --notes "Windows build of ACCELA $version" 2>$null
           if ($LASTEXITCODE -ne 0) {
-            gh release upload "$version" ACCELA.exe --clobber
+            gh release upload "$version" ACCELA.exe --repo ciscosweater/enter-the-wired --clobber
           }
