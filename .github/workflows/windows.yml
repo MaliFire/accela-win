@@ -37,7 +37,8 @@ jobs:
       - name: Locate source directory
         id: find-src
         run: |
-          $src = Get-ChildItem -Recurse -Filter "main.py" `
+          $src = Get-ChildItem -Path AppImage -Recurse -Filter "main.py" `
+            | Where-Object { $_.FullName -notmatch '\.venv' } `
             | Select-Object -First 1 -ExpandProperty DirectoryName
           echo "src-dir=$src" >> $env:GITHUB_OUTPUT
 
