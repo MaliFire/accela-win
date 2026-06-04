@@ -10,16 +10,18 @@ jobs:
       contents: write
 
     steps:
-      - name: Download release asset
+      - name: Get latest release tag
+        id: latest
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          $tag = gh release view --repo ciscosweater/enter-the-wired --json tagName --jq .tagName
+          echo "tag=$tag" >> $env:GITHUB_OUTPUT
+
+      - name: Download Linux tarball
         run: |
           curl -L -o ACCELA.tar.gz `
-            "https://github.com/ciscosweater/enter-the-wired/releases/download/20260524150213/ACCELA-20260524150213-linux.tar.gz"
-
-      - name: Verify SHA256
-        run: |
-          $expected = "1ba947a3c4d060c9064951958471e2166dc9970acef22962296bc539423e51c6"
-          $actual = (Get-FileHash ACCELA.tar.gz -Algorithm SHA256).Hash.ToLower()
-          if ($actual -ne $expected) { throw "SHA256 mismatch!" }
+            "https://github.com/ciscosweater/enter-the-wired/releases/download/${{ steps.latest.outputs.tag }}/ACCELA-${{ steps.latest.outputs.tag }}-linux.tar.gz"
 
       - name: Extract tar.gz → tar
         run: |
@@ -87,14 +89,13 @@ jobs:
           Copy-Item -Path "dist\ACCELA.exe" -Destination "${{ github.workspace }}\ACCELA.exe"
 
       - name: Upload to GitHub Release
+        uses: xresloader/upload-to-github-release@v1
         env:
-          GH_TOKEN: ${{ secrets.GH_PAT }}
-        run: |
-          $version = "20260524150213"
-          gh release create "$version" ACCELA.exe `
-            --repo ciscosweater/enter-the-wired `
-            --title "ACCELA $version (Windows)" `
-            --notes "Windows build of ACCELA $version" 2>$null
-          if ($LASTEXITCODE -ne 0) {
-            gh release upload "$version" ACCELA.exe --repo ciscosweater/enter-the-wired --clobber
-          }
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          file: ACCELA.exe
+          tag_name: ${{ steps.latest.outputs.tag }}
+          overwrite: true
+          draft: false
+          default_release_name: "ACCELA ${{ steps.latest.outputs.tag }} (Windows)"
+          default_release_body: "Windows build of ACCELA ${{ steps.latest.outputs.tag }}"
