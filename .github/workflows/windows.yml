@@ -65,6 +65,13 @@ jobs:
             --hidden-import PyQt6.QtSvg `
             --hidden-import PyQt6.QtNetwork `
             --hidden-import gevent `
+            --hidden-import urwid.display.common `
+            --hidden-import urwid.display.raw `
+            --hidden-import urwid.display.curses `
+            --hidden-import urwid.display.escape `
+            --hidden-import urwid.display.html_fragment `
+            --hidden-import urwid.display.lcd `
+            --hidden-import urwid.display.web `
             --collect-all steam `
             main.py
           Copy-Item -Path "dist\ACCELA.exe" -Destination "${{ github.workspace }}\ACCELA.exe"
