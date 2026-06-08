@@ -19,6 +19,8 @@ jobs:
           echo "tag=$tag" >> $env:GITHUB_OUTPUT
 
       - name: Download Linux tarball
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           gh release download ${{ steps.latest.outputs.tag }} --repo ciscosweater/enter-the-wired --pattern "*-linux.tar.gz" --output ACCELA.tar.gz
 
