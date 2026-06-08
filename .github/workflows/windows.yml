@@ -12,6 +12,8 @@ jobs:
     steps:
       - name: Get latest release tag
         id: latest
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           $tag = gh release view --repo ciscosweater/enter-the-wired --json tagName --jq .tagName
           echo "tag=$tag" >> $env:GITHUB_OUTPUT
