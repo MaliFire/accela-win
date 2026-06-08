@@ -12,16 +12,13 @@ jobs:
     steps:
       - name: Get latest release tag
         id: latest
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           $tag = gh release view --repo ciscosweater/enter-the-wired --json tagName --jq .tagName
           echo "tag=$tag" >> $env:GITHUB_OUTPUT
 
       - name: Download Linux tarball
         run: |
-          curl -L -o ACCELA.tar.gz `
-            "https://github.com/ciscosweater/enter-the-wired/releases/download/${{ steps.latest.outputs.tag }}/ACCELA-${{ steps.latest.outputs.tag }}-linux.tar.gz"
+          gh release download ${{ steps.latest.outputs.tag }} --repo ciscosweater/enter-the-wired --pattern "*-linux.tar.gz" --output ACCELA.tar.gz
 
       - name: Extract tar.gz → tar
         run: |
