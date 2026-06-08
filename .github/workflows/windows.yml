@@ -64,7 +64,7 @@ jobs:
         run: |
           pip install pyinstaller
           pip install PyQt6 pyqt6-sip pyqt6-qt6
-          pip install requests urllib3 psutil numpy pillow
+          pip install requests urllib3 psutil numpy pillow pyyaml
           pip install just_playback urwid vdf cryptography gevent zstandard
           pip install "steam[client]"
 
